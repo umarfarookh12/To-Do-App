@@ -74,7 +74,18 @@ function App() {
                       checked={value.completed === true ? "checked" : false}
                     />
                   </ListItemIcon>
-                  <ListItemText id={value.id} primary={value.todo} />
+                  <ListItemText
+                    id={value.id}
+                    primary={
+                      <span
+                        style={{
+                          textDecoration: value.completed ? "line-through" : "",
+                        }}
+                      >
+                        {value.todo}
+                      </span>
+                    }
+                  />
                 </ListItemButton>
               </ListItem>
             </List>
