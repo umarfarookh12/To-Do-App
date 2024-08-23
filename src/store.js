@@ -8,7 +8,6 @@ import axios from "axios";
 export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
   const response = await axios.get("https://dummyjson.com/todos");
   const todos = response.data;
-  console.log(todos);
   return todos;
 });
 
@@ -25,11 +24,19 @@ export const slice = createSlice({
       );
       state.todos[idx].completed = !state.todos[idx].completed;
     },
+    deleteTodo: (state, action) => {
+      state.todos = state.todos.filter((item) => item.id !== action.payload.id);
+    },
+    addNewTodo: (state, action) => {
+      state.todos.push(action.payload);
+    },
   },
+
   extraReducers: (builder) => {
     builder.addCase(fetchTodos.pending, (state, action) => {
       state.loading = true;
     });
+
     builder.addCase(fetchTodos.fulfilled, (state, action) => {
       state.todos = action.payload.todos;
       state.loading = false;
@@ -38,7 +45,5 @@ export const slice = createSlice({
 });
 
 export const store = configureStore({
-  reducer: {
-    todos: slice.reducer,
-  },
+  reducer: slice.reducer,
 });
