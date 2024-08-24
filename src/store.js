@@ -11,13 +11,8 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
   return todos;
 });
 
-export const addTodo = createAsyncThunk("todos/addTodo", async (id) => {
-  const response = await axios.post(`https://dummyjson.com/todos/${id}`);
-  return response.data;
-});
-
 export const deleteTodo = createAsyncThunk("todos/deleteTodo", async (id) => {
-  const response = await axios.get(`https://dummyjson.com/todos/${id}`);
+  const response = await axios.delete(`https://dummyjson.com/todos/${id}`);
   return response.data;
 });
 
@@ -31,7 +26,14 @@ export const slice = createSlice({
   initialState: { loading: false, todos: [] },
   reducers: {
     addTodo: (state, action) => {
-      state.todos.push(action.payload);
+      let exists = state.todos.find(
+        (todo) => todo.todo === action.payload.todo
+      );
+      if (exists === undefined) {
+        state.todos.push(action.payload);
+      } else {
+        alert("Task already exists");
+      }
     },
   },
 
@@ -43,10 +45,6 @@ export const slice = createSlice({
     builder.addCase(fetchTodos.fulfilled, (state, action) => {
       state.todos = action.payload.todos;
       state.loading = false;
-    });
-
-    builder.addCase(addTodo.fulfilled, (state, action) => {
-      state.todos.push(action.payload);
     });
 
     builder.addCase(deleteTodo.fulfilled, (state, action) => {
