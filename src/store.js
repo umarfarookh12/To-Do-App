@@ -16,6 +16,11 @@ export const addTodo = createAsyncThunk("todos/addTodo", async (id) => {
   return response.data;
 });
 
+export const deleteTodo = createAsyncThunk("todos/deleteTodo", async (id) => {
+  const response = await axios.get(`https://dummyjson.com/todos/${id}`);
+  return response.data;
+});
+
 export const slice = createSlice({
   name: "todos",
   initialState: { loading: false, todos: [] },
@@ -36,6 +41,10 @@ export const slice = createSlice({
     });
     builder.addCase(addTodo.fulfilled, (state, action) => {
       state.todos.push(action.payload);
+    });
+    builder.addCase(deleteTodo.fulfilled, (state, action) => {
+      state.todos = state.todos.filter((todo) => todo.id !== action.payload.id);
+      state.loading = false;
     });
   },
 });
