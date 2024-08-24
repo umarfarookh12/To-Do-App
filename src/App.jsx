@@ -6,6 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import {
   Button,
   Checkbox,
+  CircularProgress,
   Divider,
   List,
   ListItem,
@@ -13,10 +14,12 @@ import {
   ListItemText,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTodos, slice } from "./store";
+import { deleteTodo, fetchTodos, slice, updateTodo } from "./store";
 import { nanoid } from "@reduxjs/toolkit";
+import DeleteSharpIcon from "@mui/icons-material/DeleteSharp";
 
 function App() {
   const [title, setTitle] = React.useState("");
@@ -26,108 +29,121 @@ function App() {
     dispatch(fetchTodos());
   }, [dispatch]);
 
-  const handleToggle = (todo) => {
-    dispatch(slice.actions.toggleTodo(todo));
+  const handleDelete = (id) => {
+    dispatch(deleteTodo(id));
   };
 
-  const deleteTodo = (todo) => {
-    dispatch(slice.actions.deleteTodo(todo));
+  const handleUpdate = (id) => {
+    dispatch(updateTodo(id));
   };
-
   const addTodo = (todo) => {
-    dispatch(slice.actions.addNewTodo(todo));
+    dispatch(slice.actions.addTodo(todo));
   };
 
-  const todos = useSelector((state) => state.todos);
+  let todos = useSelector((state) => state.todos);
   const loading = useSelector((state) => state.loading);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <CircularProgress />;
   }
 
   return (
-    <Card
-      sx={{
-        border: "0.5px solid #80cbc4",
-        borderRadius: "13px",
-        width: 600,
-      }}
-    >
-      <CardContent>
-        <Stack
-          direction="row"
-          justifyContent="flex-start"
-          alignItems="center"
-          spacing={2}
-        >
-          <TextField
-            variant="standard"
-            label="Add new Todo"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            sx={{ width: "100%" }}
-          />
-          <Button
-            variant="contained"
-            onClick={() => {
-              if (title !== "") {
-                addTodo({ id: nanoid(), todo: title, completed: false });
-                setTitle("");
-              }
-            }}
-            type="button"
-            sx={{}}
+    <>
+      <Card
+        sx={{
+          border: "0.5px solid #80cbc4",
+          borderRadius: "5px",
+          width: 600,
+          height: 590,
+          overflowY: "auto",
+          scrollbarWidth: "thin",
+        }}
+      >
+        <CardContent>
+          <Typography
+            gutterBottom
+            variant="h5"
+            component="div"
+            sx={{ fontWeight: "bold" }}
           >
-            Add
-          </Button>
-        </Stack>
-        {todos.map((todo) => {
-          return (
-            <>
-              <List disablePadding key={todo.id} sx={{ paddingY: 1.5 }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-evenly"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <ListItem
-                    key={todo.id}
-                    disablePadding
-                    onClick={() => {
-                      handleToggle(todo);
-                    }}
+            Tasks
+          </Typography>
+          <Stack
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="center"
+            spacing={2}
+          >
+            <TextField
+              variant="outlined"
+              label="Add new Todo"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              sx={{ width: "100%" }}
+            />
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (title !== "") {
+                  addTodo({ id: nanoid(), todo: title, completed: false });
+                  setTitle("");
+                } else {
+                  alert("add todo");
+                }
+              }}
+              type="button"
+            >
+              Add
+            </Button>
+          </Stack>
+          {todos.map((todo) => {
+            return (
+              <>
+                <List disablePadding key={todo.id} sx={{ paddingY: 1.5 }}>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-evenly"
+                    alignItems="center"
+                    spacing={1}
                   >
-                    <ListItemButton dense>
-                      <Checkbox edge="start" checked={todo.completed} />
-                      <ListItemText
-                        id={todo.id}
-                        primary={<span>{todo.todo}</span>}
-                        sx={{
-                          textDecoration: todo.completed
-                            ? "line-through"
-                            : null,
-                        }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                  <Button
-                    color="error"
-                    onClick={() => {
-                      deleteTodo(todo);
-                    }}
-                  >
-                    delete
-                  </Button>
-                </Stack>
-              </List>
-              <Divider />
-            </>
-          );
-        })}
-      </CardContent>
-    </Card>
+                    <ListItem
+                      key={todo.id}
+                      disablePadding
+                      onClick={() => {
+                        handleUpdate(todo.id);
+                      }}
+                    >
+                      <ListItemButton dense>
+                        <Checkbox edge="start" checked={todo.completed} />
+                        <ListItemText
+                          id={todo.id}
+                          primary={<span>{todo.todo}</span>}
+                          sx={{
+                            textDecoration: todo.completed
+                              ? "line-through"
+                              : null,
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                    <Button
+                      color="error"
+                      onClick={() => {
+                        handleDelete(todo.id);
+                      }}
+                    >
+                      <DeleteSharpIcon />
+                    </Button>
+                  </Stack>
+                </List>
+                <Divider />
+              </>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </>
   );
 }
 
