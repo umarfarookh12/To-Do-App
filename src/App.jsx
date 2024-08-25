@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteTodo, fetchTodos, slice, updateTodo } from "./store";
+import { fetchTodos, slice } from "./store";
 import { nanoid } from "@reduxjs/toolkit";
 import DeleteSharpIcon from "@mui/icons-material/DeleteSharp";
 
@@ -29,15 +29,24 @@ function App() {
     dispatch(fetchTodos());
   }, [dispatch]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteTodo(id));
-  };
+  // const handleDelete = (id) => {
+  //   dispatch(deleteTodo(id));
+  // };
 
-  const handleUpdate = (id) => {
-    dispatch(updateTodo(id));
-  };
+  // const handleUpdate = (id) => {
+  //   dispatch(updateTodo(id));
+  // };
+
   const addTodo = (todo) => {
     dispatch(slice.actions.addTodo(todo));
+  };
+
+  const deleteTodo = (todo) => {
+    dispatch(slice.actions.deleteTodo(todo));
+  };
+
+  const handleUpdate = (todo) => {
+    dispatch(slice.actions.toggleTodo(todo));
   };
 
   let todos = useSelector((state) => state.todos);
@@ -111,7 +120,7 @@ function App() {
                       key={todo.id}
                       disablePadding
                       onClick={() => {
-                        handleUpdate(todo.id);
+                        handleUpdate(todo);
                       }}
                     >
                       <ListItemButton dense>
@@ -130,7 +139,7 @@ function App() {
                     <Button
                       color="error"
                       onClick={() => {
-                        handleDelete(todo.id);
+                        deleteTodo(todo);
                       }}
                     >
                       <DeleteSharpIcon />
