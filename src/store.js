@@ -11,16 +11,6 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
   return todos;
 });
 
-export const deleteTodo = createAsyncThunk("todos/deleteTodo", async (id) => {
-  const response = await axios.delete(`https://dummyjson.com/todos/${id}`);
-  return response.data;
-});
-
-export const updateTodo = createAsyncThunk("todos/updateTodo", async (id) => {
-  const response = await axios.get(`https://dummyjson.com/todos/${id}`);
-  return response.data;
-});
-
 export const slice = createSlice({
   name: "todos",
   initialState: { loading: false, todos: [] },
@@ -30,10 +20,19 @@ export const slice = createSlice({
         (todo) => todo.todo === action.payload.todo
       );
       if (exists === undefined) {
-        state.todos.push(action.payload);
+        state.todos.unshift(action.payload);
       } else {
         alert("Task already exists");
       }
+    },
+    toggleTodo: (state, action) => {
+      const idx = state.todos.findIndex(
+        (todo) => todo.id === action.payload.id
+      );
+      state.todos[idx].completed = !state.todos[idx].completed;
+    },
+    deleteTodo: (state, action) => {
+      state.todos = state.todos.filter((item) => item.id !== action.payload.id);
     },
   },
 
@@ -45,18 +44,6 @@ export const slice = createSlice({
     builder.addCase(fetchTodos.fulfilled, (state, action) => {
       state.todos = action.payload.todos;
       state.loading = false;
-    });
-
-    builder.addCase(deleteTodo.fulfilled, (state, action) => {
-      state.todos = state.todos.filter((todo) => todo.id !== action.payload.id);
-      state.loading = false;
-    });
-
-    builder.addCase(updateTodo.fulfilled, (state, action) => {
-      const idx = state.todos.findIndex(
-        (todo) => todo.id === action.payload.id
-      );
-      state.todos[idx].completed = !state.todos[idx].completed;
     });
   },
 });
